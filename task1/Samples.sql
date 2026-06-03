@@ -167,3 +167,67 @@ VALUES
         'Premium viewing experience',
         1.8
     );
+
+
+    INSERT INTO user(first_name,last_name,email,phone,password_hash,role_id,city_id,created_at)
+VALUES
+    (
+        'Mahdie',
+        'Davoudzade',
+        'mahdie@example.com',
+        '1111111111',
+        'hashed_password_1',
+        1,
+        4,
+        NOW()
+    ),
+    (
+        'Zeinab',
+        'Azorde',
+        'zeinab@example.com',
+        '2222222222',
+        'hashed_password_2',
+        1,
+        4,
+        NOW()
+    ),
+    (
+        'Erfan',
+        'Mamghanizade',
+        'erfan@example.com',
+        '3333333333',
+        'hashed_password_3',
+        1,
+        4,
+        NOW()
+    ),
+    (
+        'Admin',
+        'User',
+        'admin@example.com',
+        '9999999999',
+        'hashed_password_admin',
+        2,
+        1,
+        NOW()
+    );
+
+
+INSERT INTO `match`(home_team_id,away_team_id,sport_type_id,stadium_id,start_time,description)
+VALUES
+    (
+        1,
+        2,
+        1,
+        1,
+        '2026-06-20 18:00:00',
+        'Persepolis vs Esteghlal'
+    ),
+    (
+        3,
+        4,
+        2,
+        2,
+        '2026-07-01 20:00:00',
+        'Lakers vs Warriors'
+    );
