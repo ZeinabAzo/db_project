@@ -38,6 +38,30 @@ VALUES
     );
 
 
+INSERT INTO team (name, description, created_at)
+VALUES
+    (
+        'Persepolis',
+        'Iranian football club',
+        NOW()
+    ),
+    (
+        'Esteghlal',
+        'Iranian football club',
+        NOW()
+    ),
+    (
+        'Lakers',
+        'American basketball team',
+        NOW()
+    ),
+    (
+        'Warriors',
+        'NBA basketball team',
+        NOW()
+    );
+
+
 INSERT INTO refund_policy (name, description)
 VALUES
     (
@@ -79,30 +103,6 @@ VALUES
     (
         'Wheelchair Access',
         'Accessibility support for disabled users'
-    );
-
-
-INSERT INTO team (name, description, created_at)
-VALUES
-    (
-        'Persepolis',
-        'Iranian football club',
-        NOW()
-    ),
-    (
-        'Esteghlal',
-        'Iranian football club',
-        NOW()
-    ),
-    (
-        'Lakers',
-        'American basketball team',
-        NOW()
-    ),
-    (
-        'Warriors',
-        'NBA basketball team',
-        NOW()
     );
 
 
@@ -169,7 +169,7 @@ VALUES
     );
 
 
-    INSERT INTO user(first_name,last_name,email,phone,password_hash,role_id,city_id,created_at)
+INSERT INTO user(first_name,last_name,email,phone,password_hash,role_id,city_id,created_at)
 VALUES
     (
         'Mahdie',
@@ -230,4 +230,91 @@ VALUES
         2,
         '2026-07-01 20:00:00',
         'Lakers vs Warriors'
+    );
+
+
+INSERT INTO seat(section_id,seat_number,status)
+VALUES
+    (
+        1,
+        'A1',
+        'available'
+    ),
+    (
+        1,
+        'A2',
+        'available'
+    ),
+    (
+        2,
+        'B1',
+        'available'
+    ),
+    (
+        2,
+        'B2',
+        'reserved'
+    );
+
+
+INSERT INTO ticket(match_id,seat_id,ticket_type_id,refund_policy_id,price,status)
+VALUES
+    (
+        1,
+        1,
+        1,
+        2,
+        500,
+        'available'
+    ),
+    (
+        1,
+        2,
+        1,
+        2,
+        500,
+        'reserved'
+    ),
+    (
+        2,
+        3,
+        2,
+        1,
+        200,
+        'available'
+    );
+
+
+INSERT INTO reserve(user_id,ticket_id,quantity,status,created_at,expire_at)
+VALUES
+    (
+        1,
+        2,
+        1,
+        'pending',
+        NOW(),
+        DATE_ADD(NOW(), INTERVAL 10 MINUTE)
+    );
+
+
+INSERT INTO payment( reservation_id,payment_status, amount,transaction_id,paid_at)
+VALUES
+    (
+        1,
+        'pending',
+        500,
+        'TXN123456',
+        NOW()
+    );
+
+
+INSERT INTO report_about_ticket(ticket_id,reporter_id,responder_id,status,description,created_at)
+VALUES
+    (
+        2,
+        1,
+        3,
+        'pending',
+        'Payment issue during reservation',
+        NOW()
     );
