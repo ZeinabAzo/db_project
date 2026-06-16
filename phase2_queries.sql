@@ -81,3 +81,42 @@ where u.created_at =(
     select min(u2.created_at)
     from User u2
 );
+
+-- 8
+select u.first_name as first_name , u.last_name as last_name
+from User u
+inner join Reserve r 
+on r.user_id = u.user_id
+group by u.user_id
+having count(t.ticket_id) >= 2;
+
+-- 9
+select u.user_id, u.first_name, u.last_name
+from User u
+inner join Reserve r 
+on r.user_id = u.user_id
+inner join Ticket t 
+on t.ticket_id = r.ticket_id
+inner join Match m
+on m.match_id = t.match_id
+inner join sport_type s 
+on s.sport_type_id = m.sport_type_id
+where s.name = 'Football'
+group by u.user_id
+having count(t.ticket_id) <= 2;
+
+select 
+
+select u.email, u.phone 
+from User u 
+inner join Reserve r 
+on r.user_id = u.user_id
+inner join Ticket t 
+on t.ticket_id = r.ticket_id
+inner join Match m
+on m.match_id = t.match_id
+group by u.user_id, u.email, u.phone
+having count(DISTINCT m.sport_type_id) = (
+    select count(*)
+    from sport_type
+);
