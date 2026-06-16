@@ -13,7 +13,7 @@ on u.user_id = r.user_id;
 
 
 --3
-select u.user_id, u.first_name, u.last_name, MONTH(p.paied_at) as month, YEAR(p.paied_at) as year  
+select u.user_id, u.first_name, u.last_name, MONTH(p.paied_at) as month, YEAR(p.paied_at) as year , 
 sum(p.amount) as total_price
 from User u 
 inner join Reserve r 
@@ -38,7 +38,7 @@ inner join Reserve r
 on r.user_id = u.user_id
 inner join Payment p 
 on r.reserve_id = p.reservation_id
-group by u.user_id
+group by u.user_id , u.phone, u.email
 having sum(p.amount) > (
     select avg(total)
     from (
@@ -58,7 +58,7 @@ inner join Reserve r
 on u.user_id = r.user_id
 where r.reserve_at >= now() - interval 7 day 
 group by 
-u.user_id
+u.user_id, u.first_name,u.last_name
 order by total desc
 limit 3;
 
@@ -88,7 +88,7 @@ from User u
 inner join Reserve r 
 on r.user_id = u.user_id
 group by u.user_id
-having count(t.ticket_id) >= 2;
+having count(r.reserve_id) >= 2;
 
 -- 9
 select u.user_id, u.first_name, u.last_name
@@ -102,10 +102,10 @@ on m.match_id = t.match_id
 inner join sport_type s 
 on s.sport_type_id = m.sport_type_id
 where s.name = 'Football'
-group by u.user_id
+group by u.user_id, u.first_name, u.last_name
 having count(t.ticket_id) <= 2;
 
-select 
+
 
 select u.email, u.phone 
 from User u 
