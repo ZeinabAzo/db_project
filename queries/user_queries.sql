@@ -132,13 +132,13 @@ select
     u.last_name
 from user u
 inner join reserve r
-on r.user_id = u.user_id
+    on r.user_id = u.user_id
 inner join ticket t
-on t.ticket_id = r.ticket_id
-inner join match m
-on m.match_id = t.match_id
+    on t.ticket_id = r.ticket_id
+inner join `match` m
+    on m.match_id = t.match_id
 inner join sport_type s
-on s.sport_type_id = m.sport_type_id
+    on s.sport_type_id = m.sport_type_id
 where s.name = 'Football'
 group by
     u.user_id,
@@ -153,11 +153,11 @@ select
     u.phone
 from user u
 inner join reserve r
-on r.user_id = u.user_id
+    on r.user_id = u.user_id
 inner join ticket t
-on t.ticket_id = r.ticket_id
-inner join match m
-on m.match_id = t.match_id
+    on t.ticket_id = r.ticket_id
+inner join `match` m
+    on m.match_id = t.match_id
 group by
     u.user_id,
     u.email,
@@ -194,16 +194,15 @@ select
     st.name as sport,
     count(t.ticket_id) as sold_ticket
 from sport_type st
-inner join match m
-on st.sport_type_id = m.sport_type_id
+inner join `match` m
+    on st.sport_type_id = m.sport_type_id
 inner join ticket t
-on m.match_id = t.match_id
+    on m.match_id = t.match_id
 inner join reserve r
-on t.ticket_id = r.ticket_id
+    on t.ticket_id = r.ticket_id
 group by
     st.sport_type_id,
     st.name;
-
 
 -- 13
 select
@@ -211,15 +210,15 @@ select
     count(t.ticket_id) as sold_ticket
 from city c
 inner join venue v
-on c.city_id = v.city_id
+    on c.city_id = v.city_id
 inner join stadium s
-on v.venue_id = s.venue_id
-inner join match m
-on s.stadium_id = m.stadium_id
+    on v.venue_id = s.venue_id
+inner join `match` m
+    on s.staduim_id = m.staduim_id
 inner join ticket t
-on m.match_id = t.match_id
+    on m.match_id = t.match_id
 inner join reserve r
-on t.ticket_id = r.ticket_id
+    on t.ticket_id = r.ticket_id
 where c.province = 'tehran'
 group by
     c.city_id,
@@ -241,18 +240,18 @@ order by p.paied_at;
 
 -- 15
 select
-    report_subject,
+    description,
     count(*) as total_report
-from report
+from report_about_ticket
 where ticket_id =
 (
     select ticket_id
-    from report
+    from report_about_ticket
     group by ticket_id
     order by count(*) desc
     limit 1
 )
-group by report_subject;
+group by description;
 
 
 -- 16

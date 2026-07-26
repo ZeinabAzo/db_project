@@ -231,7 +231,7 @@ INSERT INTO `ticket_feature` (feature_id, ticket_id, key_value) VALUES
 (2, 1, 'covered_north_stand'),  -- Regular ticket with weather coverage
 (3, 2, 'food_vendors'),  -- Standing room with catering access
 (4, 3, 'vip_lounge'),  -- VIP ticket with lounge access
-(4, 3, 'parking_reserved'),  -- VIP also includes parking
+(8, 3, 'parking_reserved'),  -- VIP also includes parking
 (6, 5, 'wheelchair_accessible'),  -- Accessible ticket
 (1, 6, 'wifi_international_match'),  -- International match has WiFi
 (8, 6, 'vip_parking'),  -- Premium parking for international
