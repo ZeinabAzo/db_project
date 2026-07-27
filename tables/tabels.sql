@@ -1,12 +1,8 @@
 CREATE DATABASE D3;
 USE D3;
--- ==========================================
--- CREATE TABLE
--- ==========================================
 
--- ==========================================
 -- LEVEL 1
--- ==========================================
+
 CREATE TABLE `role` (
     role_id INT AUTO_INCREMENT PRIMARY KEY,
     role_name VARCHAR(255) NOT NULL,
@@ -52,9 +48,8 @@ CREATE TABLE feature (
     `desc` TEXT
 );
 
--- ==========================================
+
 -- LEVEL 2: Tables depending on Level 1
--- ==========================================
 
 CREATE TABLE users (
     user_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -94,9 +89,8 @@ CREATE TABLE venue (
 );
 
 
--- ==========================================
--- LEVEL 3: Tables depending on Level 2
--- ==========================================
+
+-- LEVEL 3
 
 CREATE TABLE stadium (
     stadium_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -111,9 +105,8 @@ CREATE TABLE stadium (
         ON DELETE CASCADE
 );
 
--- ==========================================
--- LEVEL 4: Tables depending on Level 3
--- ==========================================
+
+-- LEVEL 4
 
 CREATE TABLE section (
     section_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -127,9 +120,9 @@ CREATE TABLE section (
         ON DELETE CASCADE
 );
 
--- ==========================================
--- LEVEL 5: Tables depending on Level 4
--- ==========================================
+
+
+-- LEVEL 5
 
 CREATE TABLE seat (
     seat_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -159,10 +152,9 @@ CREATE TABLE `match` (
     FOREIGN KEY (stadium_id) REFERENCES stadium(stadium_id) ON DELETE SET NULL
 );
 
--- ==========================================
--- LEVEL 6: Tables depending on Level 5
--- ==========================================
-#موقع کنسلی بلیط ها اونارو توی رزور کنسل نشون میدم و تیکت رو به حالت در دسترس تغیر میدیم
+
+-- LEVEL 6
+
 CREATE TABLE ticket (
     ticket_id INT AUTO_INCREMENT PRIMARY KEY,
     price DECIMAL(10,2) NOT NULL,
@@ -181,9 +173,8 @@ CREATE TABLE ticket (
         UNIQUE (match_id, seat_id)
 );
 
--- ==========================================
--- LEVEL 7: Tables depending on Level 6
--- ==========================================
+
+-- LEVEL 7
 
 CREATE TABLE ticket_feature (
     feature_id INT,
@@ -222,9 +213,8 @@ CREATE TABLE report_about_ticket (
     FOREIGN KEY (reporter_id) REFERENCES users(user_id) ON DELETE RESTRICT
 );
 
--- ==========================================
--- LEVEL 8: Tables depending on Level 7
--- ==========================================
+
+-- LEVEL 8
 
 CREATE TABLE report_about_reserve (
     report_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -261,9 +251,9 @@ CREATE TABLE payment (
         REFERENCES reserve(reserve_id)
         ON DELETE RESTRICT
 );
--- ==========================================
--- LEVEL 9: Tables depending on Level 8
--- ==========================================
+
+
+-- LEVEL 9
 CREATE TABLE refund (
     refund_id INT AUTO_INCREMENT PRIMARY KEY,
     amount DECIMAL(10,2) NOT NULL,

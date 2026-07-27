@@ -22,6 +22,7 @@ CREATE INDEX match_stadium_time_idx
 ON `match`(stadium_id, start_time);
 
 
+
 -- TICKET
 
 CREATE INDEX ticket_type_idx
@@ -38,7 +39,6 @@ ON ticket(refund_policy_id);
 
 CREATE INDEX ticket_match_status_type_idx
 ON ticket(match_id, status, ticket_type_id);
-
 
 
 -- SEAT
@@ -77,7 +77,6 @@ ON payment(reservation_id);
 
 CREATE INDEX payment_transaction_idx
 ON payment(transaction_id);
-
 
 
 -- REPORT ABOUT TICKET
@@ -119,7 +118,6 @@ ON refund(payment_id);
 
 CREATE INDEX refund_status_idx
 ON refund(status);
-
 
 
 -- TICKET FEATURE
