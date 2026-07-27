@@ -1,322 +1,336 @@
--- سوال 1
-select u.first_name, u.last_name
-from user u
-left join reserve r
-on u.user_id = r.user_id
-where r.user_id is null;
-
-
--- سوال 2
-select distinct
+---1
+SELECT
     u.first_name,
     u.last_name
-from user u
-join reserve r
-    on r.user_id=u.user_id
-join payment p
-    on p.reservation_id=r.reserve_id
-where
-    r.status='confirmed'
-    and p.payment_status='completed';
-
-
--- سوال 3
-select
-    u.user_id,
-    u.first_name,
-    u.last_name,
-    month(p.paied_at) as month,
-    year(p.paied_at) as year,
-    sum(p.amount) as total_price
-from user u
-inner join reserve r
-    on r.user_id = u.user_id
-inner join payment p
-    on r.reserve_id = p.reservation_id
-where
-    r.status = 'confirmed'
-    and p.payment_status = 'completed'
-group by
-    u.user_id,
-    u.first_name,
-    u.last_name,
-    month(p.paied_at),
-    year(p.paied_at);
-    
-    
--- سوال 5
-select
-    u.first_name,
-    u.last_name,
-    u.email,
-    u.phone,
-    u.profile_image,
-    u.city_id
-from user u
-inner join reserve r
-    on r.user_id = u.user_id
-inner join payment p
-    on p.reservation_id = r.reserve_id
-where
-    r.status = 'confirmed'
-    and p.payment_status = 'completed'
-order by p.paied_at desc
-limit 1;
-
-
--- سوال 6
-select
-    u.phone,
-    u.email
-from user u
-inner join reserve r
-    on r.user_id = u.user_id
-inner join payment p
-    on r.reserve_id = p.reservation_id
-where
-    r.status = 'confirmed'
-    and p.payment_status = 'completed'
-group by
-    u.user_id,
-    u.phone,
-    u.email
-having sum(p.amount) >
-(
-    select avg(total)
-    from
-    (
-        select sum(p2.amount) as total
-        from reserve r2
-        inner join payment p2
-            on r2.reserve_id = p2.reservation_id
-        where
-            r2.status = 'confirmed'
-            and p2.payment_status = 'completed'
-        group by r2.user_id
-    ) t
+FROM users u
+WHERE NOT EXISTS (
+    SELECT 1
+    FROM reserve r
+    JOIN payment p
+        ON r.reserve_id = p.reservation_id
+    WHERE r.user_id = u.user_id
+      AND r.status = 'confirmed'
+      AND p.payment_status = 'completed'
 );
 
--- سوال 8
-select
-    u.first_name,
-    u.last_name,
-    count(p.payment_id) as total
-from user u
-inner join reserve r
-    on u.user_id = r.user_id
-inner join payment p
-    on p.reservation_id = r.reserve_id
-where
-    p.paied_at >= now() - interval 7 day
-    and r.status = 'confirmed'
-    and p.payment_status = 'completed'
-group by
-    u.user_id,
+--2
+SELECT
     u.first_name,
     u.last_name
-order by total desc
-limit 3;
-
-
--- سوال 10
-select
-    c.name as city
-from user u
-inner join city c
-    on u.city_id = c.city_id
-inner join reserve r
-    on r.user_id = u.user_id
-inner join payment p
-    on p.reservation_id = r.reserve_id
-where
-    r.status = 'confirmed'
-    and p.payment_status = 'completed'
-order by
-    u.created_at asc,
-    u.user_id asc
-limit 1;
-
--- سوال 12 
-select
-    u.first_name,
-    u.last_name
-from user u
-join reserve r
-    on r.user_id=u.user_id
-join payment p
-    on p.reservation_id=r.reserve_id
-where
-    r.status='confirmed'
-    and p.payment_status='completed'
-group by
-    u.user_id,
-    u.first_name,
-    u.last_name
-having count(*)>=2;
-
-
--- سوال 13
-select
-    u.first_name,
-    u.last_name
-from user u
-join reserve r
-    on r.user_id=u.user_id
-join payment p
-    on p.reservation_id=r.reserve_id
-join ticket t
-    on t.ticket_id=r.ticket_id
-join `match` m
-    on m.match_id=t.match_id
-join sport_type st
-    on st.sport_type_id=m.sport_type_id
-where
-    st.name='Football'
-    and r.status='confirmed'
-    and p.payment_status='completed'
-group by
-    u.user_id,
-    u.first_name,
-    u.last_name
-having count(*)<=2;
-
-
--- سوال 14
-select
-    u.email,
-    u.phone
-from user u
-join reserve r
-    on r.user_id=u.user_id
-join payment p
-    on p.reservation_id=r.reserve_id
-join ticket t
-    on t.ticket_id=r.ticket_id
-join `match` m
-    on m.match_id=t.match_id
-where
-    r.status='confirmed'
-    and p.payment_status='completed'
-group by
-    u.user_id,
-    u.email,
-    u.phone
-having count(distinct m.sport_type_id)=(
-    select count(*)
-    from sport_type
+FROM users u
+WHERE EXISTS (
+    SELECT 1
+    FROM reserve r
+    JOIN payment p
+        ON r.reserve_id = p.reservation_id
+    WHERE r.user_id = u.user_id
+      AND r.status = 'confirmed'
+      AND p.payment_status = 'completed'
 );
 
-
--- سوال 4
-select
-    c.name,
-    u.first_name,
-    u.last_name
-from user u
-join city c
-    on c.city_id=u.city_id
-join reserve r
-    on r.user_id=u.user_id
-join payment p
-    on p.reservation_id=r.reserve_id
-where
-    r.status='confirmed'
-    and p.payment_status='completed'
-group by
-    c.city_id,
-    c.name,
+--3
+SELECT
     u.user_id,
     u.first_name,
-    u.last_name
-having count(*)=1;
+    u.last_name,
+    YEAR(p.paid_at) AS payment_year,
+    MONTH(p.paid_at) AS payment_month,
+    SUM(p.amount) AS total_payment
+FROM users u
+JOIN reserve r
+    ON u.user_id = r.user_id
+JOIN payment p
+    ON r.reserve_id = p.reservation_id
+WHERE p.payment_status = 'completed'
+  AND p.paid_at IS NOT NULL
+  AND r.status = 'confirmed'
+GROUP BY
+    u.user_id,
+    u.first_name,
+    u.last_name,
+    YEAR(p.paid_at),
+    MONTH(p.paid_at)
+ORDER BY
+    u.user_id,
+    payment_year,
+    payment_month;
 
 
--- سوال 7
-select
-    st.name,
-    count(*) as sold_ticket
-from payment p
-join reserve r
-    on r.reserve_id=p.reservation_id
-join ticket t
-    on t.ticket_id=r.ticket_id
-join `match` m
-    on m.match_id=t.match_id
-join sport_type st
-    on st.sport_type_id=m.sport_type_id
-where
-    r.status='confirmed'
-    and p.payment_status='completed'
-group by
-    st.sport_type_id,
-    st.name;
-
-
--- سوال 9
-select
-    c.name,
-    count(*) as sold_ticket
-from payment p
-join reserve r
-    on r.reserve_id=p.reservation_id
-join ticket t
-    on t.ticket_id=r.ticket_id
-join `match` m
-    on m.match_id=t.match_id
-join stadium s
-    on s.staduim_id=m.staduim_id
-join venue v
-    on v.venue_id=s.venue_id
-join city c
-    on c.city_id=v.city_id
-where
-    c.province='Tehran'
-    and r.status='confirmed'
-    and p.payment_status='completed'
-group by
+--4
+SELECT
+    u.user_id,
+    u.first_name,
+    u.last_name,
+    c.name AS city_name
+FROM users u
+JOIN reserve r
+    ON u.user_id = r.user_id
+JOIN payment p
+    ON r.reserve_id = p.reservation_id
+JOIN ticket t
+    ON r.ticket_id = t.ticket_id
+JOIN `match` m
+    ON t.match_id = m.match_id
+JOIN stadium s
+    ON m.stadium_id = s.stadium_id
+JOIN venue v
+    ON s.venue_id = v.venue_id
+JOIN city c
+    ON v.city_id = c.city_id
+WHERE p.payment_status = 'completed'
+  AND r.status = 'confirmed'
+GROUP BY
+    u.user_id,
+    u.first_name,
+    u.last_name,
     c.city_id,
+    c.name
+HAVING COUNT(DISTINCT r.ticket_id) = 1
+ORDER BY
+    u.user_id,
     c.name;
 
-
--- سوال 15
-select
-    t.*,
-    p.paied_at
-from ticket t
-inner join reserve r
-    on t.ticket_id = r.ticket_id
-inner join payment p
-    on r.reserve_id = p.reservation_id
-where
-    date(p.paied_at) = curdate()
-    and r.status = 'confirmed'
-    and p.payment_status = 'completed'
-order by p.paied_at;
-
-
--- سوال 16
-select
+--5
+SELECT
+    u.user_id,
+    u.first_name,
+    u.last_name,
+    u.email,
+    u.phone,
     t.ticket_id,
-    count(*) as sold_count
-from payment p
-join reserve r
-    on r.reserve_id=p.reservation_id
-join ticket t
-    on t.ticket_id=r.ticket_id
-where
-    r.status='confirmed'
-    and p.payment_status='completed'
-group by
-    t.ticket_id
-order by
-    sold_count desc
-limit 1 offset 1;
+    t.created_at AS ticket_created_at
+FROM users u
+JOIN reserve r
+    ON u.user_id = r.user_id
+JOIN ticket t
+    ON r.ticket_id = t.ticket_id
+JOIN payment p
+    ON r.reserve_id = p.reservation_id
+WHERE p.payment_status = 'completed'
+ORDER BY t.created_at DESC
+LIMIT 1;
 
--- سوال 11
-select
+--6
+SELECT
+    u.phone,
+    u.email
+FROM users u
+JOIN reserve r
+    ON u.user_id = r.user_id
+JOIN payment p
+    ON r.reserve_id = p.reservation_id
+WHERE p.payment_status = 'completed'
+AND r.status = 'confirmed'
+GROUP BY
+    u.user_id,
+    u.phone,
+    u.email
+HAVING SUM(p.amount) > (
+    SELECT AVG(user_total)
+    FROM (
+        SELECT
+            r2.user_id,
+            SUM(p2.amount) AS user_total
+        FROM reserve r2
+        JOIN payment p2
+            ON r2.reserve_id = p2.reservation_id
+        WHERE p2.payment_status = 'completed'
+        GROUP BY r2.user_id
+    ) AS user_totals
+);
+
+--7
+SELECT
+    st.sport_type_id,
+    st.name AS sport_type,
+    COUNT(t.ticket_id) AS sold_ticket_count
+FROM sport_type st
+LEFT JOIN `match` m
+    ON st.sport_type_id = m.sport_type_id
+LEFT JOIN ticket t
+    ON m.match_id = t.match_id
+    AND t.status = 'sold'
+GROUP BY
+    st.sport_type_id,
+    st.name
+ORDER BY
+    sold_ticket_count DESC;
+
+--8
+SELECT
+    u.user_id,
+    u.first_name,
+    u.last_name,
+    COUNT(DISTINCT r.ticket_id) AS purchased_ticket_count
+FROM users u
+JOIN reserve r
+    ON u.user_id = r.user_id
+JOIN payment p
+    ON r.reserve_id = p.reservation_id
+WHERE p.payment_status = 'completed'
+AND r.status = 'confirmed'
+  AND p.paid_at >= NOW() - INTERVAL 7 DAY
+GROUP BY
+    u.user_id,
     u.first_name,
     u.last_name
-from user u
-inner join role r
-on u.role_id = r.role_id
-where r.role_name = 'support';
+ORDER BY
+    purchased_ticket_count DESC
+LIMIT 3;
+
+--9
+SELECT
+    c.name AS city_name,
+    COUNT(t.ticket_id) AS sold_ticket_count
+FROM city c
+JOIN venue v
+    ON c.city_id = v.city_id
+JOIN stadium s
+    ON v.venue_id = s.venue_id
+JOIN `match` m
+    ON s.stadium_id = m.stadium_id
+JOIN ticket t
+    ON m.match_id = t.match_id
+WHERE c.province = 'Tehran'
+  AND t.status = 'sold'
+GROUP BY
+    c.city_id,
+    c.name
+ORDER BY
+    sold_ticket_count DESC;
+
+--10
+SELECT DISTINCT
+    c.name AS city_name
+FROM users u
+JOIN reserve r
+    ON u.user_id = r.user_id
+JOIN payment p
+    ON r.reserve_id = p.reservation_id
+JOIN ticket t
+    ON r.ticket_id = t.ticket_id
+JOIN `match` m
+    ON t.match_id = m.match_id
+JOIN stadium s
+    ON m.stadium_id = s.stadium_id
+JOIN venue v
+    ON s.venue_id = v.venue_id
+JOIN city c
+    ON v.city_id = c.city_id
+WHERE u.user_id = (
+    SELECT user_id
+    FROM users
+    ORDER BY created_at ASC, user_id ASC
+    LIMIT 1
+)
+AND p.payment_status = 'completed'
+AND p.paid_at IS NOT NULL;
+
+--12
+SELECT
+    u.first_name,
+    u.last_name
+FROM users u
+JOIN `role` r
+    ON u.role_id = r.role_id
+WHERE r.role_name = 'supporter';
+
+--12
+SELECT
+    u.first_name,
+    u.last_name,
+    COUNT(DISTINCT r.ticket_id) AS purchased_ticket_count
+FROM users u
+JOIN reserve r
+    ON u.user_id = r.user_id
+JOIN payment p
+    ON r.reserve_id = p.reservation_id
+WHERE p.payment_status = 'completed'
+AND r.status = 'confirmed'
+GROUP BY
+    u.user_id,
+    u.first_name,
+    u.last_name
+HAVING COUNT(DISTINCT r.ticket_id) >= 2;
+
+--13
+SELECT
+    u.first_name,
+    u.last_name,
+    COUNT(DISTINCT r.ticket_id) AS purchased_ticket_count
+FROM users u
+JOIN reserve r
+    ON u.user_id = r.user_id
+JOIN payment p
+    ON r.reserve_id = p.reservation_id
+JOIN ticket t
+    ON r.ticket_id = t.ticket_id
+JOIN `match` m
+    ON t.match_id = m.match_id
+JOIN sport_type st
+    ON m.sport_type_id = st.sport_type_id
+WHERE p.payment_status = 'completed'
+AND r.status = 'confirmed'
+  AND st.name = 'Football'
+GROUP BY
+    u.user_id,
+    u.first_name,
+    u.last_name
+HAVING COUNT(DISTINCT r.ticket_id) <= 2;
+
+--14
+SELECT
+    u.email,
+    u.phone
+FROM users u
+JOIN reserve r
+    ON u.user_id = r.user_id
+JOIN payment p
+    ON r.reserve_id = p.reservation_id
+JOIN ticket t
+    ON r.ticket_id = t.ticket_id
+JOIN `match` m
+    ON t.match_id = m.match_id
+WHERE p.payment_status = 'completed'
+AND r.status = 'confirmed'
+GROUP BY
+    u.user_id,
+    u.email,
+    u.phone
+HAVING COUNT(DISTINCT m.sport_type_id) = (
+    SELECT COUNT(*)
+    FROM sport_type
+);
+
+--15
+SELECT
+    t.ticket_id,
+    t.price,
+    t.status,
+    p.paid_at
+FROM payment p
+JOIN reserve r
+    ON p.reservation_id = r.reserve_id
+JOIN ticket t
+    ON r.ticket_id = t.ticket_id
+WHERE p.payment_status = 'completed'
+AND r.status = 'confirmed'
+  AND p.paid_at >= CURDATE()
+  AND p.paid_at < CURDATE() + INTERVAL 1 DAY
+ORDER BY p.paid_at DESC;
+
+-- 16
+SELECT
+    m.match_id,
+    m.match_data,
+    COUNT(t.ticket_id) AS sold_ticket_count
+FROM `match` m
+JOIN ticket t
+    ON m.match_id = t.match_id
+WHERE t.status = 'sold'
+GROUP BY
+    m.match_id,
+    m.match_data
+ORDER BY
+    sold_ticket_count DESC
+LIMIT 1 OFFSET 1;
