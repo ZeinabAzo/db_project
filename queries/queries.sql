@@ -334,3 +334,121 @@ GROUP BY
 ORDER BY
     sold_ticket_count DESC
 LIMIT 1 OFFSET 1;
+
+#17
+#در کد ما برای این قسمتی که کاربر پشتیبان بتواند رزور های مشکوک را ببیند و لغو اصلاح یا تاید کند مکانیزم زیر در نظر گرفته شده است
+#یک کاربر پشتیبان میتواند یک رزور مشکوک را گزارش کند و به عنوان
+#reporter_id
+# ایدیش ثب شود تا کاربران پشتیبان های دیگر به ان نگاه کنند یا اینکه خودش رزور را برسی کنند#
+# در صورت تغیر در رزرو ایدیش به عنوان
+#responder_id
+#ثبت میشود و در قسمت رزور وضعیت رزور به حالت کنسل تغیر میکند و ایدی رزرومورد نظر در گزارش ثبت میشود
+# همچنین خود کاربران عادی هم میتواندد مشکلات در مورد رزرو خود را ثبت کنند
+# درصد رزروهای کنسل‌شده‌ای که توسط این پشتیبان رسیدگی شده، نسبت به کل رزروهای کنسل‌شده‌ای که توسط یک responder رسیدگی شده‌اند
+SELECT
+    u.first_name,
+    u.last_name,
+    COUNT(DISTINCT rar.reserve_id) AS cancelled_reserve_count,
+    ROUND(
+        COUNT(DISTINCT rar.reserve_id) * 100.0 /
+        (
+            SELECT COUNT(DISTINCT reserve_id)
+            FROM report_about_reserve
+            WHERE reserve_id IN (
+                SELECT reserve_id
+                FROM reserve
+                WHERE status = 'cancelled'
+            )
+            AND responder_id IS NOT NULL
+        ),
+        2
+    ) AS cancellation_percentage
+FROM users u
+JOIN `role` r
+    ON u.role_id = r.role_id
+JOIN report_about_reserve rar
+    ON u.user_id = rar.responder_id
+JOIN reserve res
+    ON rar.reserve_id = res.reserve_id
+WHERE r.role_name = 'supporter'
+  AND res.status = 'cancelled'
+GROUP BY
+    u.user_id,
+    u.first_name,
+    u.last_name
+ORDER BY
+    cancelled_reserve_count DESC
+LIMIT 1;
+
+#18
+UPDATE users
+SET last_name = 'Reddington'
+WHERE user_id = (
+    SELECT user_id
+    FROM (
+        SELECT
+            r.user_id
+        FROM reserve r
+        WHERE r.status = 'cancelled'
+        GROUP BY r.user_id
+        ORDER BY COUNT(*) DESC
+        LIMIT 1
+    ) AS temp
+);
+
+#19
+# در دریتا بیس ما حذف کردن تیکت کنسل شده معنا ندارد
+# چرا که موقع کنسلی از سمت کاربر ما بلافاصله وضعیت تیکت را به حالت در دسترس تغیر میدهیم
+# تا بتوانیم دوباره ان را بفروشیم مانند تمام کسب و کار ها منطقی
+#   فلذا کاری که میکنیم رزور مربوط به اون تیکت را در حالت کنسل شده قرار مدیهم تا اطلاعت را داشته باشیم
+#حذف رزرو هم در سیتم ما کار خوبی نیست چرا که رزور کلید های خارجی در جداول دیگری هست و نمیخواهیم ان ها را از دست بدهیم و وضعیت ان ها روی حالت
+#ON DELETE RESTRICT
+# قرار دادیم و نمیخواهم تغیر بدهیم
+#جداول مربوط
+#report_about_reserve , payment
+
+DELETE FROM reserve
+WHERE status = 'cancelled'
+  AND user_id IN (
+      SELECT user_id
+      FROM users
+      WHERE last_name = 'Reddington'
+  );
+
+#20
+DELETE FROM reserve
+WHERE status = 'cancelled';
+
+#21
+UPDATE ticket t
+JOIN `match` m
+    ON t.match_id = m.match_id
+JOIN stadium s
+    ON m.stadium_id = s.stadium_id
+SET t.price = t.price * 0.90
+WHERE t.status = 'sold'
+  AND s.name = 'Azadi'
+  AND DATE(m.start_time) = CURRENT_DATE - INTERVAL 1 DAY;
+
+#22
+WITH ReportCounts AS (
+    SELECT
+        ticket_id,
+        COUNT(*) AS report_count
+    FROM report_about_ticket
+    GROUP BY ticket_id
+),
+MaxReport AS (
+    SELECT MAX(report_count) AS max_report_count
+    FROM ReportCounts
+)
+SELECT
+    r.ticket_id,
+    r.description,
+    rc.report_count
+FROM report_about_ticket r
+JOIN ReportCounts rc
+    ON r.ticket_id = rc.ticket_id
+JOIN MaxReport mr
+    ON rc.report_count = mr.max_report_count
+ORDER BY r.ticket_id;
